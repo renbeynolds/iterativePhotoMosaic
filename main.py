@@ -91,18 +91,19 @@ if __name__ == '__main__':
     parser.add_argument('--ycells', nargs=1, type=int, default=64, help='Number of vertical cells in the output mosaic')
     parser.add_argument('--cellwidth', nargs=1, type=int, default=30, help='Horizontal pixels per cell')
     parser.add_argument('--cellheight', nargs=1, type=int, default=18, help='Vertical pixels per cell')
+    parser.add_argument('--store', action='store_true', help='Store the processed tiles into a Library')
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument('--tiles', nargs=1, help='Directory path containing the tile images')
     group.add_argument('--lib', action='store_true', help='Use preprocessed images in a Library folder')
     args = parser.parse_args()
 
     # Constants used for image manipulation
-    tile_width = args.cellwidth[0]
-    tile_height = args.cellheight[0]
-    x_cells = args.xcells[0]
-    y_cells = args.ycells[0]
+    tile_width = args.cellwidth
+    tile_height = args.cellheight
+    x_cells = args.xcells
+    y_cells = args.ycells
     overall_width = x_cells*tile_width
-    overall_height = y_cells*tiile_height
+    overall_height = y_cells*tile_height
     max_uses = 10
     n_cores = multiprocessing.cpu_count()
 
@@ -127,8 +128,11 @@ if __name__ == '__main__':
         tile_images = Parallel(n_jobs=n_cores)(delayed(getTile)(tile_file, tile_width, tile_height) for tile_file in tqdm(tile_files, ncols=50))
         tile_images = [{'uses':0, 'image':Image.fromstring(im['mode'], im['size'], im['pixels'])} for im in tile_images]
 
-    for idx, tile_image in enumerate(tile_images):
-        tile_image['image'].save('Library2/%d.jpg' %idx)
+    if args.store:
+        if not os.path.exists('Library'):
+            os.makedirs('Library')
+        for idx, tile_image in enumerate(tile_images):
+            tile_image['image'].save('Library/%d.jpg' %idx)
 
     # Build the initial mosaic
     mosaic_array = [[0 for x in range(x_cells)] for y in range(y_cells)] 
@@ -195,7 +199,7 @@ if __name__ == '__main__':
             mosaic_array[x1][y1] = {'id':choice2, 'fitness':new_fitness2a}
             mosaic_array[x2][y2] = {'id':choice1, 'fitness':new_fitness2b}
 
-        if args.intermediate != None and itr%args.intermediate[0] == 0:
+        if args.intermediate[0] != None and itr%args.intermediate[0] == 0:
             out_image = Image.new('RGB', (overall_width, overall_height), 'white')
             for x in range(x_cells):
                 for y in range(y_cells):
