@@ -97,10 +97,6 @@ if __name__ == '__main__':
     group.add_argument('--lib', action='store_true', help='Use preprocessed images in a Library folder')
     args = parser.parse_args()
 
-    print args.iterations
-    sys.exit()
-
-
     # Constants used for image manipulation
     tile_width = args.cellwidth[0]
     tile_height = args.cellheight[0]
