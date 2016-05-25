@@ -85,23 +85,27 @@ if __name__ == '__main__':
     # Setup and parse command line arguments
     parser = argparse.ArgumentParser()
     parser.add_argument('--target', nargs=1, required=True, help='File path for the target image')
-    parser.add_argument('--iterations', nargs=1, type=int, default=1000000, help='Total number of iterations to make')
+    parser.add_argument('--iterations', nargs=1, type=int, default=[1000000], help='Total number of iterations to make')
     parser.add_argument('--intermediate', nargs=1, type=int, help='Will save output image after every n iterations')
-    parser.add_argument('--xcells', nargs=1, type=int, default=64, help='Number of horizontal cells in the output mosaic')
-    parser.add_argument('--ycells', nargs=1, type=int, default=64, help='Number of vertical cells in the output mosaic')
-    parser.add_argument('--cellwidth', nargs=1, type=int, default=30, help='Horizontal pixels per cell')
-    parser.add_argument('--cellheight', nargs=1, type=int, default=18, help='Vertical pixels per cell')
+    parser.add_argument('--xcells', nargs=1, type=int, default=[64], help='Number of horizontal cells in the output mosaic')
+    parser.add_argument('--ycells', nargs=1, type=int, default=[64], help='Number of vertical cells in the output mosaic')
+    parser.add_argument('--cellwidth', nargs=1, type=int, default=[30], help='Horizontal pixels per cell')
+    parser.add_argument('--cellheight', nargs=1, type=int, default=[18], help='Vertical pixels per cell')
     parser.add_argument('--store', action='store_true', help='Store the processed tiles into a Library')
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument('--tiles', nargs=1, help='Directory path containing the tile images')
     group.add_argument('--lib', action='store_true', help='Use preprocessed images in a Library folder')
     args = parser.parse_args()
 
+    print args.iterations
+    sys.exit()
+
+
     # Constants used for image manipulation
-    tile_width = args.cellwidth
-    tile_height = args.cellheight
-    x_cells = args.xcells
-    y_cells = args.ycells
+    tile_width = args.cellwidth[0]
+    tile_height = args.cellheight[0]
+    x_cells = args.xcells[0]
+    y_cells = args.ycells[0]
     overall_width = x_cells*tile_width
     overall_height = y_cells*tile_height
     max_uses = 10
