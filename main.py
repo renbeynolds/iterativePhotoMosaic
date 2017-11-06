@@ -28,7 +28,7 @@ def cropAndResize(filename, new_width, new_height):
 # Helper function to allow for parellel processing of tile images
 def getTile(filename, new_width, new_height):
     image = cropAndResize(filename, new_width, new_height)
-    return {'pixels':image.tostring(), 'size':image.size, 'mode':image.mode}
+    return {'pixels':image.tobytes(), 'size':image.size, 'mode':image.mode}
 
 # Return a list of all folders in the given directory
 def getFolders(path):
@@ -98,14 +98,14 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # Constants used for image manipulation
-    tile_width = args.cellwidth[0]
-    tile_height = args.cellheight[0]
-    x_cells = args.xcells[0]
-    y_cells = args.ycells[0]
-    overall_width = x_cells*tile_width
+    tile_width     = args.cellwidth[0]
+    tile_height    = args.cellheight[0]
+    x_cells        = args.xcells[0]
+    y_cells        = args.ycells[0]
+    overall_width  = x_cells*tile_width
     overall_height = y_cells*tile_height
-    max_uses = 10
-    n_cores = multiprocessing.cpu_count()
+    max_uses       = 10
+    n_cores        = multiprocessing.cpu_count()
 
     # Grab the target image file
     target_image = cropAndResize(args.target[0], overall_width, overall_height)
@@ -126,7 +126,7 @@ if __name__ == '__main__':
     else:
         tile_files = recursive(args.tiles[0])
         tile_images = Parallel(n_jobs=n_cores)(delayed(getTile)(tile_file, tile_width, tile_height) for tile_file in tqdm(tile_files, ncols=50))
-        tile_images = [{'uses':0, 'image':Image.fromstring(im['mode'], im['size'], im['pixels'])} for im in tile_images]
+        tile_images = [{'uses':0, 'image':Image.frombytes(im['mode'], im['size'], im['pixels'])} for im in tile_images]
 
     if args.store:
         if not os.path.exists('Library'):
